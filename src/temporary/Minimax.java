@@ -1,5 +1,6 @@
 package temporary;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -37,7 +38,9 @@ public class Minimax {
 			return false;
 		if (ty >= rowColom || ty < 0)
 			return false;
+		
 		String player = board[tx][ty];
+		
 		if (!board[tx][ty].equals(player))
 			return false;
 
@@ -80,7 +83,6 @@ public class Minimax {
 							else if (player.equals("O"))
 								return -10;
 						}
-
 					}
 				}
 			}
@@ -99,7 +101,8 @@ public class Minimax {
 	private int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
 
 		int score = evaluate(board);
-
+		
+//		System.out.println(step);
 		if (score == 10) {
 			return score - step;
 		}
@@ -124,7 +127,7 @@ public class Minimax {
 
 						if (alpha >= beta) {
 							alpha = Math.max(best, alpha);
-							// r2 eturn alpha;
+							 return alpha;
 						}
 					}
 				}
@@ -144,7 +147,7 @@ public class Minimax {
 
 						if (alpha >= beta) {
 							beta = Math.min(best, beta);
-							// return beta;
+							 return beta;
 						}
 					}
 				}
@@ -219,17 +222,27 @@ public class Minimax {
 			}
 		}
 	}
+	
+	private String [][] fill(){
+		String [][] board = new String[rowColom][rowColom];
+		for(int i = 0;i<rowColom;i++){
+			for(int j=0;j<rowColom;j++){
+				board[i][j] = "-";
+			}			
+		}
+		return board;
+	}
 
 	public int play() {
-		String board[][] = { { "-", "-", "-" }, { "-", "-", "-" }, { "-", "-", "-" } };
+		String [][] board =  fill();
+				
 		printBoard(board);
-//		findOptimalMove(board);
 
 		String playerCpu = "X";
 		String playerHuman = "O";
 		String player = playerCpu;
 
-		int randomCount = 10;
+		int randomCount = 0;
 
 		Move move;
 		while (true) {
@@ -237,7 +250,7 @@ public class Minimax {
 			if (player.equals(playerCpu)) {
 				if (randomCount < 1) {
 					move = randomMove(board);
-					board[move.row][move.col] = playerCpu;
+					board[2][0] = playerCpu;
 					randomCount++;
 				} else {
 
