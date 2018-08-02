@@ -4,13 +4,13 @@ public class Main {
 
 	public static void main(String[] args) {
 //		int w = new Minimax().play();
-		int w = new Game().play();
-		if (w == 10)
-			System.out.println("CpU won");
-		else if (w == -10)
-			System.out.println("You won");
-		else
-			System.out.println("Its tie");
+//		int w = new Game().play();
+//		if (w == 10)
+//			System.out.println("CpU won");
+//		else if (w == -10)
+//			System.out.println("You won");
+//		else
+//			System.out.println("Its tie");
 	}
 
 }
