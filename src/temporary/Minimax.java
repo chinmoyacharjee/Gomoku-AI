@@ -141,7 +141,7 @@ public class Minimax {
 					if (board[i][j].equals("-")) {
 						board[i][j] = "O";
 
-						int minmaxValue = minimax(board, turn, ++step, alpha, beta);
+						int minmaxValue = minimax(board, turn, step + 1, alpha, beta);
 						board[i][j] = "-";
 						best = Math.min(best, minmaxValue);
 

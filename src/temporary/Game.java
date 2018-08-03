@@ -85,9 +85,10 @@ public class Game {
 		int bestVal = -1000;
 
 		ArrayList<GameAlgorithm> th = new ArrayList<GameAlgorithm>();
-		ArrayList<GameAlgorithm> ga = new ArrayList<>();
 
 		int thIndex = 0;
+		
+//		GameAlgorithm g;
 
 		for (int i = 0; i < rowColom; i++) {
 
@@ -101,17 +102,26 @@ public class Game {
 					int beta = 1000;
 
 					GameAlgorithm g = new GameAlgorithm(board, i, j);
-					ga.add(g);
+					//ga.add(g);
+//					g.start();
 					th.add(g);
+					board[i][j] = "-";
 					th.get(thIndex).start();
+					try {
+						th.get(thIndex).join();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					thIndex++;
+					board[i][j] = "-";
 
 					// int moveVal = minimax(board, false, step, alpha, beta);
 
 					// System.out.println(i + ", " + j + ", "+ moveVal);
 					//
 					// System.out.println();
-					board[i][j] = "-";
+					
 					//
 					// if (moveVal > bestVal) {
 					// moveI = i;
@@ -126,14 +136,7 @@ public class Game {
 //			th.get(i).start();
 //		}
 
-		for (int i = 0; i < th.size(); i++) {
-			try {
-				th.get(i).join();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+//		1 1
 
 		int moveI = -1, moveJ = -1;
 

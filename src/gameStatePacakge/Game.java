@@ -78,7 +78,7 @@ public class Game {
 
 	}
 
-	private int evaluate(String board[][]) {
+	public int evaluate(String board[][]) {
 		for (int i = 0; i < rowColom; i++) {
 			for (int j = 0; j < rowColom; j++) {
 				String player = board[i][j];
@@ -100,7 +100,7 @@ public class Game {
 		return 0;
 	}
 
-	boolean isMovesLeft(String board[][]) {
+	public boolean isMovesLeft(String board[][]) {
 		for (int i = 0; i < rowColom; i++)
 			for (int j = 0; j < rowColom; j++)
 				if (board[i][j].equals("-"))
@@ -121,7 +121,7 @@ public class Game {
 		}
 
 		if (isMovesLeft(board) == false)
-			return 0;
+			return 0 - step;
 
 		if (turn) {
 			int best = -10000;
@@ -130,7 +130,7 @@ public class Game {
 					if (board[i][j].equals("-")) {
 						board[i][j] = "X";
 
-						int minmaxValue = minimax(board, !turn, ++step, alpha, beta);
+						int minmaxValue = minimax(board, !turn, step + 1, alpha, beta);
 						board[i][j] = "-";
 						best = Math.max(best, minmaxValue);
 
@@ -150,7 +150,7 @@ public class Game {
 					if (board[i][j].equals("-")) {
 						board[i][j] = "O";
 
-						int minmaxValue = minimax(board, turn, ++step, alpha, beta);
+						int minmaxValue = minimax(board, turn, step + 1, alpha, beta);
 						board[i][j] = "-";
 						best = Math.min(best, minmaxValue);
 

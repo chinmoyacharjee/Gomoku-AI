@@ -3,6 +3,8 @@ package gameStatePacakge;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -12,7 +14,7 @@ import java.awt.image.BufferedImage;
 import asset.ImageLoader;
 import displayPackage.Display;
 
-public class GameGraphicsManagement implements Runnable, MouseListener, MouseMotionListener {
+public class GameGraphicsManagement implements Runnable, KeyListener, MouseListener, MouseMotionListener {
 
 	private Display display;
 	private int width;
@@ -40,6 +42,10 @@ public class GameGraphicsManagement implements Runnable, MouseListener, MouseMot
 	private BufferedImage white;
 	private BufferedImage mouseIndicator;
 
+	private boolean isGameEnd = false;
+
+	private boolean firstMove = true;
+
 	// temporary
 	private String[][] board;
 	private String player;
@@ -59,13 +65,16 @@ public class GameGraphicsManagement implements Runnable, MouseListener, MouseMot
 
 	private void init() {
 
+		//temporary
 		player = playerCpu;
+		//
 		game = new Game();
 
 		black = ImageLoader.loadImage("/Images/bl1.png", BOX_width, BOX_height);
 		white = ImageLoader.loadImage("/Images/w1.png", BOX_width, BOX_height);
 		mouseIndicator = ImageLoader.loadImage("/Images/w1.png", BOX_width, BOX_height);
 
+		display.canvas.addKeyListener(this);
 		display.canvas.addMouseMotionListener(this);
 		display.canvas.addMouseListener(this);
 	}
@@ -164,6 +173,26 @@ public class GameGraphicsManagement implements Runnable, MouseListener, MouseMot
 
 	}
 
+	private void checkWin(Graphics g) {
+
+		int x = game.evaluate(board);
+
+		g.setFont(new Font("Century Gothic", Font.CENTER_BASELINE, 20));
+
+		isGameEnd = true;
+
+		if (x == 10) {
+			g.drawString("Cpu won", width - 150, 250);
+		} else if (x == -10) {
+			g.drawString("You won", width - 150, 250);
+		} else if (game.isMovesLeft(board) == false) {
+			g.drawString("Tie", width - 150, 250);
+		} else {
+			isGameEnd = false;
+		}
+
+	}
+
 	private void render() {
 		buffer = display.canvas.getBufferStrategy();
 		if (buffer == null) {
@@ -175,18 +204,26 @@ public class GameGraphicsManagement implements Runnable, MouseListener, MouseMot
 
 		g.clearRect(0, 0, width, height);
 
+		checkWin(g);
 		drawBoard(g);
 		drawPlayer(g);
 		mousePointAt(g);
+		
 
 		buffer.show();
 		g.dispose();
 	}
 
 	private void play() {
-
+		Move move;
 		if (player.equals(playerCpu)) {
-			Move move = game.findOptimalMove(board);
+			if (firstMove) {
+//				 move = game.randomMove(board);
+				move = new Move(1, 1);
+				 firstMove = false;
+			} else {
+				 move = game.findOptimalMove(board);
+			}
 			board[move.row][move.col] = playerCpu;
 			game.printBoard(board);
 			player = playerHuman;
@@ -202,6 +239,15 @@ public class GameGraphicsManagement implements Runnable, MouseListener, MouseMot
 			}
 		}
 		return board;
+	}
+
+	public void resetGame() {
+		board = fill();
+		isGameEnd = false;
+		//temporary		
+		player = playerCpu;
+		//		
+		firstMove = true;
 	}
 
 	@Override
@@ -220,7 +266,7 @@ public class GameGraphicsManagement implements Runnable, MouseListener, MouseMot
 		int x = e.getX();
 		int y = e.getY();
 
-		if (player.equals(playerHuman)) {
+		if (!isGameEnd && player.equals(playerHuman)) {
 
 			if (mousePointAtX < 1 || mousePointAtX > rowColom || mousePointAtY < 1 || mousePointAtY > rowColom) {
 				mousePointAtX = -1;
@@ -231,8 +277,9 @@ public class GameGraphicsManagement implements Runnable, MouseListener, MouseMot
 				board[mousePointAtX - 1][mousePointAtY - 1] = "O";
 
 				game.printBoard(board);
+				//temporary
 				player = playerCpu;
-
+				//
 			}
 		} else {
 			mousePointAtX = -1;
@@ -267,7 +314,7 @@ public class GameGraphicsManagement implements Runnable, MouseListener, MouseMot
 		int x = e.getX();
 		int y = e.getY();
 
-		if (player.equals(playerHuman)) {
+		if (!isGameEnd && player.equals(playerHuman)) {
 
 			mousePointAtX = y / BOX_height;
 			mousePointAtY = x / BOX_width;
@@ -280,6 +327,26 @@ public class GameGraphicsManagement implements Runnable, MouseListener, MouseMot
 			mousePointAtX = -1;
 			mousePointAtY = -1;
 		}
+
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		switch (e.getKeyCode()) {
+		case KeyEvent.VK_SPACE:
+			if (isGameEnd)
+				resetGame();
+			break;
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
 
 	}
 }

@@ -1,6 +1,5 @@
 package temporary;
 
-import java.sql.Time;
 
 public class GameAlgorithm extends Thread {
 	private int fx[] = { +0, +0, +1, -1, -1, +1, -1, +1 };
@@ -86,11 +85,10 @@ public class GameAlgorithm extends Thread {
 		return false;
 	}
 
-	private int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
+	private  int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
 
 		int score = evaluate(board);
 
-		// System.out.println(step);
 		if (score == 10) {
 			return score - step;
 		}
@@ -100,7 +98,7 @@ public class GameAlgorithm extends Thread {
 		}
 
 		if (isMovesLeft(board) == false)
-			return 0;
+			return 0 - step;
 
 		if (turn) {
 			int best = -10000;
@@ -109,13 +107,13 @@ public class GameAlgorithm extends Thread {
 					if (board[i][j].equals("-")) {
 						board[i][j] = "X";
 
-						int minmaxValue = minimax(board, !turn, ++step, alpha, beta);
+						int minmaxValue = minimax(board, !turn, step + 1, alpha, beta);
 						board[i][j] = "-";
 						best = Math.max(best, minmaxValue);
 
 						if (alpha >= beta) {
 							alpha = Math.max(best, alpha);
-							return best;
+							return alpha;
 						}
 					}
 				}
@@ -129,13 +127,13 @@ public class GameAlgorithm extends Thread {
 					if (board[i][j].equals("-")) {
 						board[i][j] = "O";
 
-						int minmaxValue = minimax(board, turn, ++step, alpha, beta);
+						int minmaxValue = minimax(board, turn, step + 1, alpha, beta);
 						board[i][j] = "-";
 						best = Math.min(best, minmaxValue);
 
 						if (alpha >= beta) {
 							beta = Math.min(best, beta);
-							return best;
+							return beta;
 						}
 					}
 				}
@@ -147,7 +145,19 @@ public class GameAlgorithm extends Thread {
 
 	}
 
+	// public void start() {
+	//
+	// t = new Thread(this);
+	// t.start();
+	//
+	// }
+
 	public int getBest() {
+		try {
+			this.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		return best;
 	}
 
@@ -161,14 +171,20 @@ public class GameAlgorithm extends Thread {
 
 	@Override
 	public void run() {
+		
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		best = minimax(board, false, 0, -1000, 1000);
 
-//		System.out.println("id: " + this.getId() + ", " + best);
-		// try {
-		// Thread.sleep(1000);
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
+//		synchronized (board) {
+//		}
+		System.out.println(best + ", " + i + ", " + j);
+
 	}
 
 }
