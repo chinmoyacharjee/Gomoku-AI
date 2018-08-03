@@ -1,176 +1,205 @@
 package gameStatePacakge;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferStrategy;
 import java.util.Random;
 
-import displayPackage.Display;
+public class Game {
 
-public class Game implements Runnable, MouseListener, MouseMotionListener {
+	public int rowColom = 3;
 
-	private Display display;
-	private int width;
-	private int height;
-	private String title;
+	private int fx[] = { +0, +0, +1, -1, -1, +1, -1, +1 };
+	private int fy[] = { -1, +1, +0, +0, +1, +1, -1, -1 };
 
-	private Thread thread;
+	public void printBoard(String board[][]) {
+		for (int i = 0; i < rowColom; i++)
+			System.out.print("|-----");
+		System.out.println("|");
 
-	private int BOX_width = 50;
-	private int BOX_height = 50;
+		for (int i = 0; i < rowColom; i++) {
+			System.out.print("|  ");
+			for (int j = 0; j < rowColom; j++) {
+				System.out.print(board[i][j]);
+				if (j != rowColom - 1)
+					System.out.print("  |  ");
+			}
+			System.out.println("  |  ");
 
-	private int paddingX = 50;
-	private int paddingY = 50;
-
-	private int mousePointAtX = -1;
-	private int mousePointAtY = -1;
-
-	private BufferStrategy buffer;
-	private Graphics g;
-
-	public Game(int width, int height, String title) {
-
-		this.width = width;
-		this.height = height;
-		this.title = title;
-		this.display = new Display(width, height, title);
-
-	}
-
-	public synchronized void start() {
-		thread = new Thread(this);
-		thread.start();
-
-	}
-
-	public synchronized void stop() {
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+			for (int k = 0; k < rowColom; k++)
+				System.out.print("|-----");
+			System.out.println("|");
 		}
 
 	}
 
-	private void drawBoard(Graphics g) {
+	Move randomMove(String board[][]) {
 
-		g.setColor(Color.red);
-
-		int lineNumber = 1;
-
-		for (int i = paddingX; i < (15 * BOX_width) + paddingX; i += BOX_width) {
-			g.drawString(Integer.toString(lineNumber++), i, paddingY - 20);
-			g.drawLine(i, paddingY, i, BOX_height * 15);
-		}
-
-		lineNumber = 1;
-
-		for (int i = paddingY; i < (15 * BOX_height) + paddingY; i += BOX_height) {
-			g.drawString(Integer.toString(lineNumber++), paddingX - 20, i + 2);
-			g.drawLine(paddingX, i, BOX_width * 15, i);
-		}
-
-	}
-
-	private void mousePointAt(Graphics g) {
-		String s = mousePointAtX + ", " + mousePointAtY;
-		g.setColor(Color.blue);
-		g.setFont(new Font("arial", Font.CENTER_BASELINE, 14));
-
-		if (!(mousePointAtX == -1 || mousePointAtY == -1)){
-			g.drawString(s, width - 150, 50);
-			mousePointIndicatior(g);
-		}
-
-	}
-
-	private void mousePointIndicatior(Graphics g) {
-
-		int x = mousePointAtX * BOX_width - (BOX_width / 2);
-		int y = mousePointAtY * BOX_height - (BOX_height / 2);
-
-		g.setColor(Color.GRAY);
-		g.fillOval(x, y, BOX_width, BOX_height);
-
-	}
-	
-	private void drawPlayer(){
-		
-	}
-
-	private void render() {
-		buffer = display.canvas.getBufferStrategy();
-		if (buffer == null) {
-			display.canvas.createBufferStrategy(3);
-			return;
-		}
-
-		g = buffer.getDrawGraphics();
-
-		g.clearRect(0, 0, width, height);
-		
-		drawBoard(g);
-		
-		mousePointAt(g);
-
-		buffer.show();
-
-		g.dispose();
-	}
-
-	private void init() {
-		display.canvas.addMouseMotionListener(this);
-		display.canvas.addMouseListener(this);
-	}
-
-	@Override
-	public void run() {
-		init();
 		while (true) {
-			render();
+			int i = new Random().nextInt(rowColom);
+			int j = new Random().nextInt(rowColom);
+
+			if (board[i][j].equals("-")) {
+				return new Move(i, j);
+			}
 		}
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent e) {}
+	private boolean isValid(int tx, int ty, String board[][]) {
 
-	@Override
-	public void mousePressed(MouseEvent e) {}
+		if (tx >= rowColom || tx < 0)
+			return false;
+		if (ty >= rowColom || ty < 0)
+			return false;
 
-	@Override
-	public void mouseReleased(MouseEvent e) {}
+		String player = board[tx][ty];
 
-	@Override
-	public void mouseEntered(MouseEvent e) {}
+		if (!board[tx][ty].equals(player))
+			return false;
 
-	@Override
-	public void mouseExited(MouseEvent e) {}
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-
+		return true;
 	}
 
-	@Override
-	public void mouseMoved(MouseEvent e) {
+	private boolean isWinner(int tx, int ty, int dx, int dy, String board[][]) {
+		String player = board[tx][ty];
+		int count = 0;
+		while (true) {
+			if (player.equals(board[tx][ty])) {
+				count++;
+			} else
+				return false;
 
-		int x = e.getX();
-		int y = e.getY();
+			if (count == rowColom)
+				return true;
 
-		mousePointAtX = x / BOX_width;
-		mousePointAtY = y / BOX_height;
+			tx += dx;
+			ty += dy;
 
-		if (mousePointAtX < 1 || mousePointAtX > 15 || mousePointAtY < 1 || mousePointAtY > 15) {
-			mousePointAtX = -1;
-			mousePointAtY = -1;
+			if (!isValid(tx, ty, board))
+				return false;
 		}
 
-		// System.out.println(x +" "+ y);
-		
+	}
+
+	private int evaluate(String board[][]) {
+		for (int i = 0; i < rowColom; i++) {
+			for (int j = 0; j < rowColom; j++) {
+				String player = board[i][j];
+				if (player.equals("X") || player.equals("O")) {
+					for (int k = 0; k < 8; k++) {
+						int dirX = fx[k];
+						int dirY = fy[k];
+
+						if (isWinner(i, j, dirX, dirY, board)) {
+							if (player.equals("X"))
+								return 10;
+							else if (player.equals("O"))
+								return -10;
+						}
+					}
+				}
+			}
+		}
+		return 0;
+	}
+
+	boolean isMovesLeft(String board[][]) {
+		for (int i = 0; i < rowColom; i++)
+			for (int j = 0; j < rowColom; j++)
+				if (board[i][j].equals("-"))
+					return true;
+		return false;
+	}
+
+	private int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
+
+		int score = evaluate(board);
+
+		if (score == 10) {
+			return score - step;
+		}
+
+		if (score == -10) {
+			return score + step;
+		}
+
+		if (isMovesLeft(board) == false)
+			return 0;
+
+		if (turn) {
+			int best = -10000;
+			for (int i = 0; i < rowColom; i++) {
+				for (int j = 0; j < rowColom; j++) {
+					if (board[i][j].equals("-")) {
+						board[i][j] = "X";
+
+						int minmaxValue = minimax(board, !turn, ++step, alpha, beta);
+						board[i][j] = "-";
+						best = Math.max(best, minmaxValue);
+
+						if (alpha >= beta) {
+							alpha = Math.max(best, alpha);
+							return alpha;
+						}
+					}
+				}
+			}
+			return best;
+
+		} else {
+			int best = 10000;
+			for (int i = 0; i < rowColom; i++) {
+				for (int j = 0; j < rowColom; j++) {
+					if (board[i][j].equals("-")) {
+						board[i][j] = "O";
+
+						int minmaxValue = minimax(board, turn, ++step, alpha, beta);
+						board[i][j] = "-";
+						best = Math.min(best, minmaxValue);
+
+						if (alpha >= beta) {
+							beta = Math.min(best, beta);
+							return beta;
+						}
+					}
+				}
+			}
+
+			return best;
+		}
 
 	}
+
+	public Move findOptimalMove(String board[][]) {
+		int bestVal = -1000;
+
+		int moveI = -9;
+		int moveJ = -9;
+
+		for (int i = 0; i < rowColom; i++) {
+
+			for (int j = 0; j < rowColom; j++) {
+
+				if (board[i][j].equals("-")) {
+
+					board[i][j] = "X";
+					int step = 0;
+					int alpha = -1000;
+					int beta = 1000;
+					int moveVal = minimax(board, false, step, alpha, beta);
+
+					System.out.println(i + ", " + j + ", " + moveVal);
+
+					System.out.println();
+					board[i][j] = "-";
+
+					if (moveVal > bestVal) {
+						moveI = i;
+						moveJ = j;
+						bestVal = moveVal;
+					}
+				}
+			}
+		}
+		System.out.println(moveI + ", " + moveJ);
+		return new Move(moveI, moveJ);
+	}
+
 }

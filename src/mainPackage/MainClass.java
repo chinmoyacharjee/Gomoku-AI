@@ -1,10 +1,10 @@
 package mainPackage;
 
 import displayPackage.Display;
-import gameStatePacakge.Game;
+import gameStatePacakge.GameGraphicsManagement;
 
 public class MainClass {
 	public static void main(String [] args){
-		new Game(1000, 900, "Gomoku-AI").start();
+		new GameGraphicsManagement(1000, 900, "Gomoku-AI").start();
 	}
 }
