@@ -38,9 +38,9 @@ public class Minimax {
 			return false;
 		if (ty >= rowColom || ty < 0)
 			return false;
-		
+
 		String player = board[tx][ty];
-		
+
 		if (!board[tx][ty].equals(player))
 			return false;
 
@@ -101,8 +101,8 @@ public class Minimax {
 	private int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
 
 		int score = evaluate(board);
-		
-//		System.out.println(step);
+
+		// System.out.println(step);
 		if (score == 10) {
 			return score - step;
 		}
@@ -121,13 +121,13 @@ public class Minimax {
 					if (board[i][j].equals("-")) {
 						board[i][j] = "X";
 
-						int minmaxValue = minimax(board, !turn, ++step, alpha, beta);
+						int minmaxValue = minimax(board, !turn, step + 1, alpha, beta);
 						board[i][j] = "-";
 						best = Math.max(best, minmaxValue);
 
 						if (alpha >= beta) {
 							alpha = Math.max(best, alpha);
-							 return alpha;
+							return alpha;
 						}
 					}
 				}
@@ -147,7 +147,7 @@ public class Minimax {
 
 						if (alpha >= beta) {
 							beta = Math.min(best, beta);
-							 return beta;
+							return beta;
 						}
 					}
 				}
@@ -177,7 +177,7 @@ public class Minimax {
 					int beta = 1000;
 					int moveVal = minimax(board, false, step, alpha, beta);
 
-					System.out.println(i + ", " + j + ", "+ moveVal);
+					System.out.println(i + ", " + j + ", " + moveVal);
 
 					System.out.println();
 					board[i][j] = "-";
@@ -222,20 +222,20 @@ public class Minimax {
 			}
 		}
 	}
-	
-	private String [][] fill(){
-		String [][] board = new String[rowColom][rowColom];
-		for(int i = 0;i<rowColom;i++){
-			for(int j=0;j<rowColom;j++){
+
+	private String[][] fill() {
+		String[][] board = new String[rowColom][rowColom];
+		for (int i = 0; i < rowColom; i++) {
+			for (int j = 0; j < rowColom; j++) {
 				board[i][j] = "-";
-			}			
+			}
 		}
 		return board;
 	}
 
 	public int play() {
-		String [][] board =  fill();
-				
+		String[][] board = fill();
+
 		printBoard(board);
 
 		String playerCpu = "X";
@@ -258,7 +258,7 @@ public class Minimax {
 					board[move.row][move.col] = playerCpu;
 				}
 				player = playerHuman;
-//				randomCount++;
+				// randomCount++;
 			} else if (player.equals(playerHuman)) {
 				move = humanMove(board);
 				board[move.row][move.col] = playerHuman;

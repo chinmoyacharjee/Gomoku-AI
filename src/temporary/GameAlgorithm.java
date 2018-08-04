@@ -1,6 +1,5 @@
 package temporary;
 
-
 public class GameAlgorithm extends Thread {
 	private int fx[] = { +0, +0, +1, -1, -1, +1, -1, +1 };
 	private int fy[] = { -1, +1, +0, +0, +1, +1, -1, -1 };
@@ -10,13 +9,13 @@ public class GameAlgorithm extends Thread {
 
 	private String[][] board;
 
-	private int i;
-	private int j;
+	private int row;
+	private int col;
 
 	public GameAlgorithm(String[][] board, int i, int j) {
 		this.board = board;
-		this.i = i;
-		this.j = j;
+		this.row = i;
+		this.col = j;
 	}
 
 	private boolean isValid(int tx, int ty, String board[][]) {
@@ -85,10 +84,11 @@ public class GameAlgorithm extends Thread {
 		return false;
 	}
 
-	private  int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
+	private synchronized int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
 
-		int score = evaluate(board);
+		int score = this.evaluate(board);
 
+		// System.out.println(step);
 		if (score == 10) {
 			return score - step;
 		}
@@ -98,7 +98,7 @@ public class GameAlgorithm extends Thread {
 		}
 
 		if (isMovesLeft(board) == false)
-			return 0 - step;
+			return 0;
 
 		if (turn) {
 			int best = -10000;
@@ -107,7 +107,7 @@ public class GameAlgorithm extends Thread {
 					if (board[i][j].equals("-")) {
 						board[i][j] = "X";
 
-						int minmaxValue = minimax(board, !turn, step + 1, alpha, beta);
+						int minmaxValue = minimax(board, !turn, ++step, alpha, beta);
 						board[i][j] = "-";
 						best = Math.max(best, minmaxValue);
 
@@ -162,28 +162,32 @@ public class GameAlgorithm extends Thread {
 	}
 
 	public int getI() {
-		return i;
+		return row;
 	}
 
 	public int getJ() {
-		return j;
+		return col;
 	}
 
 	@Override
 	public void run() {
-		
+
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
+		System.out.println("AliveBefore: " + this.getId() + "; " + this.isAlive() + " best: " + best + " " + row + col);
+		//
 		best = minimax(board, false, 0, -1000, 1000);
 
-//		synchronized (board) {
-//		}
-		System.out.println(best + ", " + i + ", " + j);
+		System.out.println("AliveAfter : " + this.getId() + "; " + this.isAlive() + " best: " + best + " " + row + col);
+
+		// synchronized (board) {
+		// }
+		// System.out.println(best + ", " + row + ", " + col);
 
 	}
 
