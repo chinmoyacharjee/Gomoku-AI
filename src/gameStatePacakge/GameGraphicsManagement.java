@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 
 import asset.ImageLoader;
 import displayPackage.Display;
+import gameSettings.GameSettings;
 
 public class GameGraphicsManagement implements Runnable, KeyListener, MouseListener, MouseMotionListener {
 
@@ -35,9 +36,10 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	private BufferStrategy buffer;
 	private Graphics g;
 
-	private int rowColom = 3;
+	private int rowColom;
 
 	private Game game;
+	private Evaluation evaluation;
 	private BufferedImage black;
 	private BufferedImage white;
 	private BufferedImage mouseIndicator;
@@ -54,21 +56,23 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	private String playerEmpty = "-";
 	//
 
-	public GameGraphicsManagement(int width, int height, String title) {
+	public GameGraphicsManagement() {
 
-		this.width = width;
-		this.height = height;
-		this.title = title;
+		this.width = GameSettings.width;
+		this.height = GameSettings.height;
+		this.title = GameSettings.title;
 		this.display = new Display(width, height, title);
 
+		this.rowColom = GameSettings.rowColom;
 	}
 
 	private void init() {
 
-		//temporary
-		player = playerCpu;
+		// temporary
+		player = playerHuman;
 		//
 		game = new Game();
+		evaluation = new Evaluation();
 
 		black = ImageLoader.loadImage("/Images/bl1.png", BOX_width, BOX_height);
 		white = ImageLoader.loadImage("/Images/w1.png", BOX_width, BOX_height);
@@ -208,7 +212,6 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 		drawBoard(g);
 		drawPlayer(g);
 		mousePointAt(g);
-		
 
 		buffer.show();
 		g.dispose();
@@ -218,11 +221,11 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 		Move move;
 		if (player.equals(playerCpu)) {
 			if (firstMove) {
-//				 move = game.randomMove(board);
+				// move = game.randomMove(board);
 				move = new Move(1, 1);
-				 firstMove = false;
+				firstMove = false;
 			} else {
-				 move = game.findOptimalMove(board);
+				move = game.findOptimalMove(board);
 			}
 			board[move.row][move.col] = playerCpu;
 			game.printBoard(board);
@@ -244,9 +247,9 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	public void resetGame() {
 		board = fill();
 		isGameEnd = false;
-		//temporary		
-		player = playerCpu;
-		//		
+		// temporary
+		player = playerHuman;
+		//
 		firstMove = true;
 	}
 
@@ -256,7 +259,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 		board = fill();
 		while (true) {
 			render();
-			play();
+			// play();
 
 		}
 	}
@@ -274,12 +277,22 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 			}
 
 			else {
-				board[mousePointAtX - 1][mousePointAtY - 1] = "O";
 
-				game.printBoard(board);
-				//temporary
-				player = playerCpu;
-				//
+				int row = mousePointAtX - 1;
+				int col = mousePointAtY - 1;
+
+				if (board[row][col].equals(playerEmpty)) {
+					board[row][col] = "O";
+
+					System.out.println("#####");
+					evaluation.evaluate3(board);
+
+//					 game.printBoard(board);
+					// temporary
+					player = playerHuman;
+					//
+
+				}
 			}
 		} else {
 			mousePointAtX = -1;
@@ -339,8 +352,9 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_SPACE:
-			if (isGameEnd)
-				resetGame();
+			resetGame(); //temp
+//			if (isGameEnd)
+//				resetGame();
 			break;
 		}
 	}

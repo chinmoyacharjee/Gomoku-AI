@@ -2,13 +2,19 @@ package gameStatePacakge;
 
 import java.util.Random;
 
+import gameSettings.GameSettings;
+
 public class Game {
 
-	public int rowColom = 3;
+	public int rowColom;
 
 	private int fx[] = { +0, +0, +1, -1, -1, +1, -1, +1 };
 	private int fy[] = { -1, +1, +0, +0, +1, +1, -1, -1 };
 
+	public Game(){
+		this.rowColom = GameSettings.rowColom;
+	}
+	
 	public void printBoard(String board[][]) {
 		for (int i = 0; i < rowColom; i++)
 			System.out.print("|-----");
@@ -36,20 +42,18 @@ public class Game {
 			int i = new Random().nextInt(rowColom);
 			int j = new Random().nextInt(rowColom);
 
-			if (board[i][j].equals("-")) {
+			if (board[i][j].equals("-")){
 				return new Move(i, j);
 			}
 		}
 	}
 
-	private boolean isValid(int tx, int ty, String board[][]) {
+	private boolean isValid(int tx, int ty, String board[][], String player) {
 
 		if (tx >= rowColom || tx < 0)
 			return false;
 		if (ty >= rowColom || ty < 0)
 			return false;
-
-		String player = board[tx][ty];
 
 		if (!board[tx][ty].equals(player))
 			return false;
@@ -72,7 +76,7 @@ public class Game {
 			tx += dx;
 			ty += dy;
 
-			if (!isValid(tx, ty, board))
+			if (!isValid(tx, ty, board, player))
 				return false;
 		}
 

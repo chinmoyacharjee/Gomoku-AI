@@ -5,7 +5,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Game {
-	private int rowColom = 3;
+	private int rowColom = 4;
 
 	private void printBoard(String board[][]) {
 		for (int i = 0; i < rowColom; i++)
@@ -85,11 +85,9 @@ public class Game {
 		int bestVal = -1000;
 
 		ArrayList<GameAlgorithm> th = new ArrayList<GameAlgorithm>();
-		System.out.println("Size: "+ th.size());
+		System.out.println("Size: " + th.size());
 
 		int thIndex = 0;
-
-		// GameAlgorithm g;
 
 		for (int i = 0; i < rowColom; i++) {
 
@@ -98,42 +96,24 @@ public class Game {
 				if (board[i][j].equals("-")) {
 
 					board[i][j] = "X";
-					int step = 0;
-					int alpha = -1000;
-					int beta = 1000;
 
 					GameAlgorithm g = new GameAlgorithm(board, i, j);
-					// ga.add(g);
-					// g.start();
+
 					th.add(g);
-					//board[i][j] = "-";
-					th.get(thIndex).start();
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					thIndex++;
-					// board[i][j] = "-";
-
-					// int moveVal = minimax(board, false, step, alpha, beta);
-
-					// System.out.println(i + ", " + j + ", "+ moveVal);
-					//
-					// System.out.println();
-
-					//
-					// if (moveVal > bestVal) {
-					// moveI = i;
-					// moveJ = j;
-					// bestVal = moveVal;
-					// }
+					board[i][j] = "-";
 				}
 
 			}
 		}
+		for (int i = 0; i < th.size(); i++) {
+			th.get(i).start();
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 		for (int i = 0; i < th.size(); i++) {
 			try {
 				th.get(i).join();

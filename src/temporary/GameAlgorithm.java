@@ -4,7 +4,9 @@ public class GameAlgorithm extends Thread {
 	private int fx[] = { +0, +0, +1, -1, -1, +1, -1, +1 };
 	private int fy[] = { -1, +1, +0, +0, +1, +1, -1, -1 };
 
-	private int rowColom = 3;
+	private int rowColom = 4;
+	private int winValue = 4;
+	
 	private int best;
 
 	private String[][] board;
@@ -42,7 +44,7 @@ public class GameAlgorithm extends Thread {
 			} else
 				return false;
 
-			if (count == rowColom)
+			if (count == winValue)
 				return true;
 
 			tx += dx;
@@ -67,7 +69,7 @@ public class GameAlgorithm extends Thread {
 							if (player.equals("X"))
 								return 10;
 							else if (player.equals("O"))
-								return -10;
+								return -2;
 						}
 					}
 				}
@@ -84,11 +86,10 @@ public class GameAlgorithm extends Thread {
 		return false;
 	}
 
-	private synchronized int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
+	private  int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
 
 		int score = this.evaluate(board);
-
-		// System.out.println(step);
+		
 		if (score == 10) {
 			return score - step;
 		}
@@ -98,7 +99,7 @@ public class GameAlgorithm extends Thread {
 		}
 
 		if (isMovesLeft(board) == false)
-			return 0;
+			return 0 - step;
 
 		if (turn) {
 			int best = -10000;
@@ -110,9 +111,9 @@ public class GameAlgorithm extends Thread {
 						int minmaxValue = minimax(board, !turn, ++step, alpha, beta);
 						board[i][j] = "-";
 						best = Math.max(best, minmaxValue);
-
+						alpha = Math.max(best, alpha);
 						if (alpha >= beta) {
-							alpha = Math.max(best, alpha);
+							
 							return alpha;
 						}
 					}
@@ -130,9 +131,9 @@ public class GameAlgorithm extends Thread {
 						int minmaxValue = minimax(board, turn, step + 1, alpha, beta);
 						board[i][j] = "-";
 						best = Math.min(best, minmaxValue);
-
+						beta = Math.min(best, beta);
 						if (alpha >= beta) {
-							beta = Math.min(best, beta);
+							
 							return beta;
 						}
 					}
@@ -172,12 +173,11 @@ public class GameAlgorithm extends Thread {
 	@Override
 	public void run() {
 
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			Thread.sleep(100);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 
 		System.out.println("AliveBefore: " + this.getId() + "; " + this.isAlive() + " best: " + best + " " + row + col);
 		//

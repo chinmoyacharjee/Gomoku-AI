@@ -6,7 +6,8 @@ import java.util.Scanner;
 
 public class Minimax {
 
-	private int rowColom = 3;
+	private int rowColom = 4;
+	
 
 	private int fx[] = { +0, +0, +1, -1, -1, +1, -1, +1 };
 	private int fy[] = { -1, +1, +0, +0, +1, +1, -1, -1 };
@@ -124,9 +125,9 @@ public class Minimax {
 						int minmaxValue = minimax(board, !turn, step + 1, alpha, beta);
 						board[i][j] = "-";
 						best = Math.max(best, minmaxValue);
+						alpha = Math.max(best, alpha);
 
 						if (alpha >= beta) {
-							alpha = Math.max(best, alpha);
 							return alpha;
 						}
 					}
@@ -144,9 +145,9 @@ public class Minimax {
 						int minmaxValue = minimax(board, turn, step + 1, alpha, beta);
 						board[i][j] = "-";
 						best = Math.min(best, minmaxValue);
+						beta = Math.min(best, beta);
 
 						if (alpha >= beta) {
-							beta = Math.min(best, beta);
 							return beta;
 						}
 					}
@@ -250,7 +251,7 @@ public class Minimax {
 			if (player.equals(playerCpu)) {
 				if (randomCount < 1) {
 					move = randomMove(board);
-					board[2][0] = playerCpu;
+					board[1][1] = playerCpu;
 					randomCount++;
 				} else {
 
