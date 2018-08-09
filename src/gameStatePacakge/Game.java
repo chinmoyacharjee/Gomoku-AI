@@ -11,10 +11,22 @@ public class Game {
 	private int fx[] = { +0, +0, +1, -1, -1, +1, -1, +1 };
 	private int fy[] = { -1, +1, +0, +0, +1, +1, -1, -1 };
 
-	public Game(){
+	private Evaluation evaluation;
+	private int depth = 2;
+
+	// temp
+	int startI = 0;
+	int startJ = 0;
+
+	int endI = rowColom;
+	int endJ = rowColom;
+	//
+
+	public Game() {
 		this.rowColom = GameSettings.rowColom;
+		evaluation = new Evaluation();
 	}
-	
+
 	public void printBoard(String board[][]) {
 		for (int i = 0; i < rowColom; i++)
 			System.out.print("|-----");
@@ -39,13 +51,17 @@ public class Game {
 	Move randomMove(String board[][]) {
 
 		while (true) {
-			int i = new Random().nextInt(rowColom);
-			int j = new Random().nextInt(rowColom);
+			int i = new Random().nextInt(rowColom / 2);
+			int j = new Random().nextInt(rowColom / 2);
 
-			if (board[i][j].equals("-")){
+			if (board[i][j].equals("-")) {
 				return new Move(i, j);
 			}
 		}
+	}
+
+	public Move getFirstMove() {
+		return new Move(4, 4);
 	}
 
 	private boolean isValid(int tx, int ty, String board[][], String player) {
@@ -61,6 +77,14 @@ public class Game {
 		return true;
 	}
 
+	private boolean isValidDir(int tx, int ty) {
+		if (tx >= rowColom || tx < 0)
+			return false;
+		if (ty >= rowColom || ty < 0)
+			return false;
+		return true;
+	}
+
 	private boolean isWinner(int tx, int ty, int dx, int dy, String board[][]) {
 		String player = board[tx][ty];
 		int count = 0;
@@ -70,7 +94,7 @@ public class Game {
 			} else
 				return false;
 
-			if (count == rowColom)
+			if (count == 5)
 				return true;
 
 			tx += dx;
@@ -82,7 +106,7 @@ public class Game {
 
 	}
 
-	public int evaluate(String board[][]) {
+	public int checkWin(String board[][]) {
 		for (int i = 0; i < rowColom; i++) {
 			for (int j = 0; j < rowColom; j++) {
 				String player = board[i][j];
@@ -114,32 +138,29 @@ public class Game {
 
 	private int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
 
-		int score = evaluate(board);
-
-		if (score == 10) {
-			return score - step;
+		if (step == depth) {
+			return evaluation.evaluate(board, turn);
 		}
-
-		if (score == -10) {
-			return score + step;
-		}
-
-		if (isMovesLeft(board) == false)
-			return 0 - step;
 
 		if (turn) {
-			int best = -10000;
-			for (int i = 0; i < rowColom; i++) {
-				for (int j = 0; j < rowColom; j++) {
+			int best = -Integer.MAX_VALUE;
+			for (int i = startI; i < endI; i++) {
+				if (alpha >= beta) {
+					return alpha;
+				}
+				for (int j = startJ; j < endJ; j++) {
+					if (!hasAdjacent(i, j, board))
+						continue;
+
 					if (board[i][j].equals("-")) {
 						board[i][j] = "X";
 
 						int minmaxValue = minimax(board, !turn, step + 1, alpha, beta);
 						board[i][j] = "-";
 						best = Math.max(best, minmaxValue);
+						alpha = Math.max(best, alpha);
 
 						if (alpha >= beta) {
-							alpha = Math.max(best, alpha);
 							return alpha;
 						}
 					}
@@ -148,18 +169,24 @@ public class Game {
 			return best;
 
 		} else {
-			int best = 10000;
-			for (int i = 0; i < rowColom; i++) {
-				for (int j = 0; j < rowColom; j++) {
+			int best = Integer.MAX_VALUE;
+			for (int i = startI; i < endI; i++) {
+				if (alpha >= beta) {
+					return beta;
+				}
+				for (int j = startJ; j < endJ; j++) {
+					if (!hasAdjacent(i, j, board))
+						continue;
+
 					if (board[i][j].equals("-")) {
 						board[i][j] = "O";
 
 						int minmaxValue = minimax(board, turn, step + 1, alpha, beta);
 						board[i][j] = "-";
 						best = Math.min(best, minmaxValue);
+						beta = Math.min(best, beta);
 
 						if (alpha >= beta) {
-							beta = Math.min(best, beta);
 							return beta;
 						}
 					}
@@ -171,27 +198,121 @@ public class Game {
 
 	}
 
+	private boolean hasAdjacent(int i, int j, String board[][]) {
+
+		for (int ii = 0; ii < 8; ii++) {
+			int x = i;
+			int y = j;
+			for (int jj = 0; jj < 2; jj++) {
+
+				x += fx[ii];
+				y += fy[ii];
+
+				if (!isValidDir(x, y))
+					continue;
+
+				if (board[x][y] == "X" || board[x][y] == "O")
+					return true;
+			}
+		}
+
+		return false;
+
+	}
+
+	private String[][] buildSmallBoard(String board[][]) {
+		int maxI = 0;
+		int maxJ = 0;
+
+		int minI = rowColom - 1;
+		int minJ = rowColom - 1;
+
+		for (int i = 0; i < rowColom; i++) {
+			for (int j = 0; j < rowColom; j++) {
+				if (board[i][j] == "X" || board[i][j] == "O") {
+					if (minI > i) {
+						minI = i;
+					}
+					if (minJ > j) {
+						minJ = j;
+					}
+
+					if (maxI < i) {
+						maxI = i;
+					}
+					if (maxJ < j) {
+						maxJ = j;
+					}
+				}
+			}
+		}
+
+		String[][] smallBoard = new String[rowColom][rowColom];
+
+		int x = 1;
+		if (minI >= x)
+			minI -= x;
+		else
+			minI = 0;
+		if (minJ >= x)
+			minJ -= x;
+		else
+			minJ = 0;
+
+		if (maxI < rowColom - x)
+			maxI += x;
+		else
+			maxI = rowColom - 1;
+		if (maxJ < rowColom - x)
+			maxJ += x;
+		else
+			maxJ = 0;
+
+		startI = minI;
+		startJ = minJ;
+
+		endI = maxI + 1;
+		endJ = maxJ + 1;
+
+		for (int i = minI; i <= maxI; i++) {
+			for (int j = 0; j <= maxJ; j++) {
+				smallBoard[i][j] = board[i][j];
+			}
+		}
+
+		return smallBoard;
+
+	}
+
 	public Move findOptimalMove(String board[][]) {
-		int bestVal = -1000;
+		int bestVal = -Integer.MAX_VALUE;
 
 		int moveI = -9;
 		int moveJ = -9;
 
-		for (int i = 0; i < rowColom; i++) {
+		int step = 0;
+		int alpha = -Integer.MAX_VALUE;
+		int beta = Integer.MAX_VALUE;
 
-			for (int j = 0; j < rowColom; j++) {
+		board = buildSmallBoard(board);
+
+		for (int i = startI; i < endI; i++) {
+			if (alpha >= beta)
+				break;
+
+			for (int j = startJ; j < endJ; j++) {
+				// temp
+				// if (!hasAdjacent(i, j, board))
+				// continue;
 
 				if (board[i][j].equals("-")) {
 
 					board[i][j] = "X";
-					int step = 0;
-					int alpha = -1000;
-					int beta = 1000;
+
 					int moveVal = minimax(board, false, step, alpha, beta);
 
-					System.out.println(i + ", " + j + ", " + moveVal);
+					alpha = Math.max(moveVal, alpha);
 
-					System.out.println();
 					board[i][j] = "-";
 
 					if (moveVal > bestVal) {
@@ -199,6 +320,9 @@ public class Game {
 						moveJ = j;
 						bestVal = moveVal;
 					}
+					if (alpha >= beta)
+						break;
+
 				}
 			}
 		}

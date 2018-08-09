@@ -37,8 +37,9 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	private Graphics g;
 
 	private int rowColom;
-
+	// temp
 	private Game game;
+	//
 	private Evaluation evaluation;
 	private BufferedImage black;
 	private BufferedImage white;
@@ -69,7 +70,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	private void init() {
 
 		// temporary
-		player = playerHuman;
+		player = playerCpu;
 		//
 		game = new Game();
 		evaluation = new Evaluation();
@@ -179,7 +180,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	private void checkWin(Graphics g) {
 
-		int x = game.evaluate(board);
+		int x = game.checkWin(board);
 
 		g.setFont(new Font("Century Gothic", Font.CENTER_BASELINE, 20));
 
@@ -220,15 +221,16 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	private void play() {
 		Move move;
 		if (player.equals(playerCpu)) {
+
 			if (firstMove) {
-				// move = game.randomMove(board);
-				move = new Move(1, 1);
+				move = game.getFirstMove();
 				firstMove = false;
 			} else {
 				move = game.findOptimalMove(board);
 			}
+			//
 			board[move.row][move.col] = playerCpu;
-			game.printBoard(board);
+			// game.printBoard(board);
 			player = playerHuman;
 		}
 
@@ -248,7 +250,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 		board = fill();
 		isGameEnd = false;
 		// temporary
-		player = playerHuman;
+		player = playerCpu;
 		//
 		firstMove = true;
 	}
@@ -259,7 +261,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 		board = fill();
 		while (true) {
 			render();
-			// play();
+			play();
 
 		}
 	}
@@ -282,14 +284,11 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 				int col = mousePointAtY - 1;
 
 				if (board[row][col].equals(playerEmpty)) {
+					//
 					board[row][col] = "O";
-
-					System.out.println("#####");
-					evaluation.evaluate3(board);
-
-//					 game.printBoard(board);
+					//
 					// temporary
-					player = playerHuman;
+					player = playerCpu;
 					//
 
 				}
@@ -352,9 +351,9 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_SPACE:
-			resetGame(); //temp
-//			if (isGameEnd)
-//				resetGame();
+			resetGame(); // temp
+			// if (isGameEnd)
+			// resetGame();
 			break;
 		}
 	}

@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
+import gameStatePacakge.Move;
+
 public class Game {
-	private int rowColom = 4;
+	private int rowColom = 10;
+	
+	private int fx[] = { +0, +0, +1, -1, -1, +1, -1, +1 };
+	private int fy[] = { -1, +1, +0, +0, +1, +1, -1, -1 };
 
 	private void printBoard(String board[][]) {
 		for (int i = 0; i < rowColom; i++)
@@ -40,6 +45,10 @@ public class Game {
 		}
 	}
 
+	public Move getFirstMove() {
+		return new Move(4, 4);
+	}
+	
 	Move humanMove(String board[][]) {
 		while (true) {
 			int i;
@@ -80,9 +89,43 @@ public class Game {
 		}
 		return ind;
 	}
+	private boolean isValidDir(int tx, int ty) {
+		if (tx >= rowColom || tx < 0)
+			return false;
+		if (ty >= rowColom || ty < 0)
+			return false;
+		return true;
+	}
+	private boolean hasAdjacent(int i, int j, String board[][]) {
 
-	private Move findOptimalMove(String board[][]) {
-		int bestVal = -1000;
+		for (int ii = 0; ii < 8; ii++) {
+			int x = i;
+			int y = j;
+			for (int jj = 0; jj < 1; jj++) {
+
+				x += fx[ii];
+				y += fy[ii];
+
+				if (!isValidDir(x, y))
+					continue;
+
+				if (board[x][y] == "X" || board[x][y] == "O")
+					return true;
+			}
+		}
+
+		return false;
+
+	}
+
+
+	public Move findOptimalMove(String board[][]) {
+		int bestVal = -Integer.MAX_VALUE;
+
+
+		int step = 0;
+		int alpha = -Integer.MAX_VALUE;
+		int beta = Integer.MAX_VALUE;
 
 		ArrayList<GameAlgorithm> th = new ArrayList<GameAlgorithm>();
 		System.out.println("Size: " + th.size());
@@ -92,6 +135,9 @@ public class Game {
 		for (int i = 0; i < rowColom; i++) {
 
 			for (int j = 0; j < rowColom; j++) {
+
+				if (!hasAdjacent(i, j, board))
+					continue;
 
 				if (board[i][j].equals("-")) {
 
