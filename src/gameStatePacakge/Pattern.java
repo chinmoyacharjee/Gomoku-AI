@@ -8,7 +8,6 @@ public class Pattern {
 	public static HashMap<String, Integer> patternsCPU;
 	public static HashMap<String, Integer> patternsHUMAN;
 
-	// 17
 
 	private String[] patternListX = { "XXXXX", "-XXXX-", "XXXX-", "XX-XX", "XXX-X", "X-XXX-", "-XXX-", "XXX--", "-XX-X",
 			"XX-X-", "-XX-X-", "--XX-", "XX---", "X---X", "X----", "--X--", "-X---" };

@@ -46,7 +46,7 @@ public class Game {
 
 	}
 
-	Move randomMove(String board[][]) {
+	public Move randomMove(String board[][]) {
 
 		while (true) {
 			int i = new Random().nextInt(rowColom / 2);
