@@ -4,7 +4,7 @@ public class Main {
 
 	public static void main(String[] args) {
 //		int w = new Minimax().play();
-//		int w = new Game().play();
+//		int w = new GameManipulation().play();
 //		if (w == 10)
 //			System.out.println("CpU won");
 //		else if (w == -10)

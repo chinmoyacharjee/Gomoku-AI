@@ -15,9 +15,6 @@ public class Evaluation {
 
 	private Pattern patternClass;
 
-	// temp
-	HashMap<String, Integer> map;
-
 	public Evaluation() {
 		this.rowColom = GameSettings.rowColom;
 		patternClass = new Pattern();
@@ -31,27 +28,7 @@ public class Evaluation {
 		return true;
 	}
 
-	// temp
-	private void patterns(String pat) {
-
-		if (map.containsKey(pat)) {
-			map.put(pat, map.get(pat) + 1);
-		} else
-			map.put(pat, 1);
-	}
-
-	// temp
-	private void printPattern() {
-		Iterator it = map.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pair = (Map.Entry) it.next();
-			System.out.print(pair.getKey() + " * " + pair.getValue() + " + ");
-			it.remove(); // avoids a ConcurrentModificationException
-		}
-	}
-
 	private int findPattern(int tx, int ty, int dx, int dy, String board[][], boolean cpuTurn) {
-		String player = board[tx][ty];
 
 		String consecutivePattern = "";
 		int saveIndex = -1;
@@ -115,10 +92,7 @@ public class Evaluation {
 	}
 
 	public int evaluate(String board[][], boolean cpuTurn) {
-		// temp
-		map = new HashMap<>();
-		//
-
+		
 		int evalVal = 0;
 		for (int i = 0; i < rowColom; i++) {
 			for (int j = 0; j < rowColom; j++) {
@@ -137,7 +111,7 @@ public class Evaluation {
 			}
 
 		}
-		// printPattern();
+		
 		return evalVal;
 	}
 

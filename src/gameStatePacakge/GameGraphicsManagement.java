@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import asset.ImageLoader;
 import displayPackage.Display;
 import gameSettings.GameSettings;
+import temporary.GameManipulation;
 
 public class GameGraphicsManagement implements Runnable, KeyListener, MouseListener, MouseMotionListener {
 
@@ -40,12 +41,17 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	// temp
 	private Game game;
 	//
-	private Evaluation evaluation;
 	private BufferedImage black;
 	private BufferedImage white;
 	private BufferedImage mouseIndicator;
+	private BufferedImage background;
+	private BufferedImage logo;
 
 	private boolean isGameEnd = false;
+	private boolean isGameStarted = false;
+	private String winStatement = "";
+	private String lastMoveComputer = "";
+	private String lastMoveYou = "";
 
 	private boolean firstMove = true;
 
@@ -73,11 +79,13 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 		player = playerCpu;
 		//
 		game = new Game();
-		evaluation = new Evaluation();
+		// evaluation = new Evaluation();
 
 		black = ImageLoader.loadImage("/Images/bl1.png", BOX_width, BOX_height);
 		white = ImageLoader.loadImage("/Images/w1.png", BOX_width, BOX_height);
 		mouseIndicator = ImageLoader.loadImage("/Images/w1.png", BOX_width, BOX_height);
+		background = ImageLoader.loadImage("/Images/background3.jpg", width, height);
+		logo = ImageLoader.loadImage("/Images/logo.png");
 
 		display.canvas.addKeyListener(this);
 		display.canvas.addMouseMotionListener(this);
@@ -101,34 +109,47 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	private void drawBoard(Graphics g) {
 
-		g.setColor(Color.BLACK);
+		g.setColor(Color.WHITE);
+
+		int lineWeight = 1;
 
 		int lineNumber = 1;
+		char lineCharacter = 'A';
 
 		for (int i = paddingX; i < (rowColom * BOX_width) + paddingX; i += BOX_width) {
-			g.drawString(Integer.toString(lineNumber++), i, paddingY - 20);
-			g.drawLine(i, paddingY, i, BOX_height * rowColom);
-		}
+			g.setFont(new Font("arial", Font.CENTER_BASELINE, 14));
+			g.drawString(Character.toString(lineCharacter++), i, paddingY - 25);
+			for (int k = i - lineWeight; k < i + lineWeight; k++)
+				g.drawLine(k, paddingY, k, BOX_height * rowColom);
 
+		}
 		lineNumber = 1;
 
 		for (int i = paddingY; i < (rowColom * BOX_height) + paddingY; i += BOX_height) {
-			g.drawString(Integer.toString(lineNumber++), paddingX - 20, i + 2);
-			g.drawLine(paddingX, i, BOX_width * rowColom, i);
+			g.drawString(Integer.toString(lineNumber++), paddingX - 35, i + 2);
+			for (int k = i - lineWeight; k < i + lineWeight; k++)
+				g.drawLine(paddingX, k, BOX_width * rowColom, k);
 		}
+
+	}
+
+	private String colomToString(int x) {
+		char c = 'A';
+		c += x;
+		return Character.toString(c);
 
 	}
 
 	private void mousePointAt(Graphics g) {
 
-		g.setColor(Color.blue);
-		g.setFont(new Font("arial", Font.CENTER_BASELINE, 14));
+		g.setColor(Color.white);
+		g.setFont(new Font("Agency fb", Font.CENTER_BASELINE, 40));
 
-		String s = mousePointAtX + ", " + mousePointAtY;
+		String s = colomToString(mousePointAtY - 1) + ", " + mousePointAtX;
 
 		if (!(mousePointAtX == -1 || mousePointAtY == -1)
 				&& board[mousePointAtX - 1][mousePointAtY - 1].equals(playerEmpty)) {
-			g.drawString(s, width - 150, 50);
+			g.drawString(s, mousePointAtY * 50 + 30, mousePointAtX * 50 + 30);
 			mousePointIndicatior(g);
 		}
 
@@ -149,27 +170,19 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	private void drawPlayer(Graphics g) {
 
-		Color playerHumanColor = Color.BLUE;
-		Color playerCpuColor = Color.GREEN;
-
-		Color color = playerCpuColor;
-
 		BufferedImage playerImage = null;
 		for (int i = 0; i < rowColom; i++) {
 			for (int j = 0; j < rowColom; j++) {
 
 				if (board[i][j].equals(playerCpu)) {
-					// color = playerCpuColor;
 					playerImage = black;
 				} else if (board[i][j].equals(playerHuman)) {
-					// color = playerHumanColor;
 					playerImage = white;
 				}
 				if (!board[i][j].equals(playerEmpty)) {
-					g.setColor(color);
+
 					int x = (j + 1) * BOX_width - (BOX_width / 2);
 					int y = (i + 1) * BOX_height - (BOX_height / 2);
-					// g.fillOval(x, y, BOX_width, BOX_height);
 					g.drawImage(playerImage, x, y, null);
 
 				}
@@ -178,23 +191,80 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	}
 
-	private void checkWin(Graphics g) {
-
+	private void checkWin() {
 		int x = game.checkWin(board);
-
-		g.setFont(new Font("Century Gothic", Font.CENTER_BASELINE, 20));
 
 		isGameEnd = true;
 
 		if (x == 10) {
-			g.drawString("Cpu won", width - 150, 250);
-		} else if (x == -10) {
-			g.drawString("You won", width - 150, 250);
-		} else if (game.isMovesLeft(board) == false) {
-			g.drawString("Tie", width - 150, 250);
-		} else {
-			isGameEnd = false;
+			winStatement = "Computer Won";
 		}
+
+		else if (x == -10) {
+			winStatement = "You Won";
+		}
+
+		else if (game.isMovesLeft(board) == false) {
+			winStatement = "Tie";
+
+		} else
+			isGameEnd = false;
+
+	}
+
+	private void drawBackground(Graphics g) {
+		g.drawImage(background, 0, 0, null);
+	}
+
+	private void drawLogo(Graphics g) {
+		g.drawImage(logo, width - 340, 20, null);
+	}
+
+	private void drawWinStatus(Graphics g) {
+		if (isGameEnd) {
+			g.setColor(Color.white);
+			g.setFont(new Font("Century Gothic", Font.CENTER_BASELINE, 20));
+
+			g.drawString(winStatement, width - 340, 400);
+
+		}
+	}
+
+	private void drawStartPlayString(Graphics g) {
+		if (!isGameStarted) {
+			g.setColor(Color.white);
+			g.setFont(new Font("Century Gothic", Font.BOLD, 20));
+
+			g.drawString("Press Enter to start the game", width - 340, 450);
+
+		}
+	}
+
+	private void drawLastMove(Graphics g) {
+		if (isGameStarted) {
+			g.setFont(new Font("Century Gothic", Font.CENTER_BASELINE, 20));
+
+			g.setColor(Color.white);
+			g.drawString("Last Move:", width - 340, 220);
+			g.drawString(lastMoveComputer, width - 340, 250);
+
+			g.setColor(Color.black);
+			g.drawString(lastMoveYou, width - 340, 280);
+
+		}
+
+	}
+
+	private void draw(Graphics g) {
+
+		drawBackground(g);
+		drawLogo(g);
+		drawStartPlayString(g);
+		drawLastMove(g);
+		drawWinStatus(g);
+		drawBoard(g);
+		drawPlayer(g);
+		mousePointAt(g);
 
 	}
 
@@ -209,10 +279,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 		g.clearRect(0, 0, width, height);
 
-		checkWin(g);
-		drawBoard(g);
-		drawPlayer(g);
-		mousePointAt(g);
+		draw(g);
 
 		buffer.show();
 		g.dispose();
@@ -228,40 +295,34 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 			} else {
 				move = game.findOptimalMove(board);
 			}
-			//
+
 			board[move.row][move.col] = playerCpu;
-			// game.printBoard(board);
+
+			lastMoveComputer = "Computer, " + colomToString(move.col) + (move.row + 1);
+
+			checkWin();
 			player = playerHuman;
 		}
 
 	}
 
-	private String[][] fill() {
-		String[][] board = new String[rowColom][rowColom];
-		for (int i = 0; i < rowColom; i++) {
-			for (int j = 0; j < rowColom; j++) {
-				board[i][j] = playerEmpty;
-			}
-		}
-		return board;
-	}
-
 	public void resetGame() {
-		board = fill();
+		board = game.initialiseBoard();
 		isGameEnd = false;
-		// temporary
 		player = playerCpu;
-		//
+		isGameStarted = false;
 		firstMove = true;
 	}
 
 	@Override
 	public void run() {
 		init();
-		board = fill();
+		board = game.initialiseBoard();
+
 		while (true) {
 			render();
-			play();
+			if (isGameStarted)
+				play();
 
 		}
 	}
@@ -284,12 +345,13 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 				int col = mousePointAtY - 1;
 
 				if (board[row][col].equals(playerEmpty)) {
-					//
+
 					board[row][col] = "O";
-					//
-					// temporary
+
+					lastMoveYou = "You, " + colomToString(col) + (row + 1);
+
+					checkWin();
 					player = playerCpu;
-					//
 
 				}
 			}
@@ -350,10 +412,12 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	@Override
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
+
 		case KeyEvent.VK_SPACE:
-			resetGame(); // temp
-			// if (isGameEnd)
-			// resetGame();
+			resetGame();
+			break;
+		case KeyEvent.VK_ENTER:
+			isGameStarted = true;
 			break;
 		}
 	}

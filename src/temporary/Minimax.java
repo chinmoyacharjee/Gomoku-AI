@@ -153,7 +153,6 @@ public class Minimax {
 					}
 				}
 			}
-
 			return best;
 		}
 		// return 0;

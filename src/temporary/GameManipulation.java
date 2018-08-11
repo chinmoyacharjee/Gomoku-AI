@@ -1,31 +1,33 @@
-package gameStatePacakge;
+package temporary;
 
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 import gameSettings.GameSettings;
+import gameStatePacakge.Evaluation;
+import gameStatePacakge.Move;
 
-public class Game {
-
-	public int rowColom;
+public class GameManipulation {
+	private int rowColom = 10;
 
 	private int fx[] = { +0, +0, +1, -1, -1, +1, -1, +1 };
 	private int fy[] = { -1, +1, +0, +0, +1, +1, -1, -1 };
 
-	private Evaluation evaluation;
 	private int depth = 2;
 
+	// temp
 	int startI = 0;
 	int startJ = 0;
 
 	int endI = rowColom;
 	int endJ = rowColom;
 
-	public Game() {
+	public GameManipulation() {
 		this.rowColom = GameSettings.rowColom;
-		evaluation = new Evaluation();
 	}
 
-	public void printBoard(String board[][]) {
+	private void printBoard(String board[][]) {
 		for (int i = 0; i < rowColom; i++)
 			System.out.print("|-----");
 		System.out.println("|");
@@ -46,32 +48,6 @@ public class Game {
 
 	}
 
-	Move randomMove(String board[][]) {
-
-		while (true) {
-			int i = new Random().nextInt(rowColom / 2);
-			int j = new Random().nextInt(rowColom / 2);
-
-			if (board[i][j].equals("-")) {
-				return new Move(i, j);
-			}
-		}
-	}
-
-	public Move getFirstMove() {
-		return new Move(4, 4);
-	}
-
-	public String[][] initialiseBoard() {
-		String[][] board = new String[rowColom][rowColom];
-		for (int i = 0; i < rowColom; i++) {
-			for (int j = 0; j < rowColom; j++) {
-				board[i][j] = "-";
-			}
-		}
-		return board;
-	}
-
 	private boolean isValid(int tx, int ty, String board[][], String player) {
 
 		if (tx >= rowColom || tx < 0)
@@ -82,14 +58,6 @@ public class Game {
 		if (!board[tx][ty].equals(player))
 			return false;
 
-		return true;
-	}
-
-	private boolean isValidDir(int tx, int ty) {
-		if (tx >= rowColom || tx < 0)
-			return false;
-		if (ty >= rowColom || ty < 0)
-			return false;
 		return true;
 	}
 
@@ -136,6 +104,72 @@ public class Game {
 		return 0;
 	}
 
+	Move randomMove(String board[][]) {
+
+		while (true) {
+			int i = new Random().nextInt(rowColom);
+			int j = new Random().nextInt(rowColom);
+
+			if (board[i][j].equals("-")) {
+				return new Move(i, j);
+			}
+		}
+	}
+
+	public Move getFirstMove() {
+		return new Move(4, 4);
+	}
+
+	Move humanMove(String board[][]) {
+		while (true) {
+			int i;
+			int j;
+			System.out.print("row col: ");
+			Scanner sc = new Scanner(System.in);
+			i = sc.nextInt();
+			j = sc.nextInt();
+
+			if (board[i][j].equals("-")) {
+				return new Move(i, j);
+			} else {
+				System.out.println("Enter Valid Input");
+			}
+		}
+	}
+
+	private String[][] fill() {
+		String[][] board = new String[rowColom][rowColom];
+		for (int i = 0; i < rowColom; i++) {
+			for (int j = 0; j < rowColom; j++) {
+				board[i][j] = "-";
+			}
+		}
+		return board;
+	}
+
+	private int getBestIndex(ArrayList<GameAlgorithm> gl) {
+		int max = -Integer.MAX_VALUE;
+		int ind = -1;
+		for (int i = 0; i < gl.size(); i++) {
+			System.out.println(gl.get(i).getBest());
+			if (max < gl.get(i).getBest()) {
+				max = gl.get(i).getBest();
+				ind = i;
+
+			}
+			System.out.println(gl.get(i).getI() + ", " + gl.get(i).getJ() + ", " + gl.get(i).getBest());
+		}
+		return ind;
+	}
+
+	private boolean isValidDir(int tx, int ty) {
+		if (tx >= rowColom || tx < 0)
+			return false;
+		if (ty >= rowColom || ty < 0)
+			return false;
+		return true;
+	}
+
 	public boolean isMovesLeft(String board[][]) {
 		for (int i = 0; i < rowColom; i++)
 			for (int j = 0; j < rowColom; j++)
@@ -144,73 +178,12 @@ public class Game {
 		return false;
 	}
 
-	private int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
-
-		if (step == depth) {
-			return evaluation.evaluate(board, turn);
-		}
-
-		if (turn) {
-			int best = -Integer.MAX_VALUE;
-			for (int i = startI; i < endI; i++) {
-				if (alpha >= beta) {
-					return alpha;
-				}
-				for (int j = startJ; j < endJ; j++) {
-					if (!hasAdjacent(i, j, board))
-						continue;
-
-					if (board[i][j].equals("-")) {
-						board[i][j] = "X";
-
-						int minmaxValue = minimax(board, !turn, step + 1, alpha, beta);
-						board[i][j] = "-";
-						best = Math.max(best, minmaxValue);
-						alpha = Math.max(best, alpha);
-
-						if (alpha >= beta) {
-							return alpha;
-						}
-					}
-				}
-			}
-			return best;
-
-		} else {
-			int best = Integer.MAX_VALUE;
-			for (int i = startI; i < endI; i++) {
-				if (alpha >= beta) {
-					return beta;
-				}
-				for (int j = startJ; j < endJ; j++) {
-					if (!hasAdjacent(i, j, board))
-						continue;
-
-					if (board[i][j].equals("-")) {
-						board[i][j] = "O";
-
-						int minmaxValue = minimax(board, turn, step + 1, alpha, beta);
-						board[i][j] = "-";
-						best = Math.min(best, minmaxValue);
-						beta = Math.min(best, beta);
-
-						if (alpha >= beta) {
-							return beta;
-						}
-					}
-				}
-			}
-
-			return best;
-		}
-	}
-
 	private boolean hasAdjacent(int i, int j, String board[][]) {
 
 		for (int ii = 0; ii < 8; ii++) {
 			int x = i;
 			int y = j;
-			for (int jj = 0; jj < 2; jj++) {
+			for (int jj = 0; jj < 1; jj++) {
 
 				x += fx[ii];
 				y += fy[ii];
@@ -222,9 +195,7 @@ public class Game {
 					return true;
 			}
 		}
-
 		return false;
-
 	}
 
 	private String[][] buildSmallBoard(String board[][]) {
@@ -288,53 +259,66 @@ public class Game {
 		}
 
 		return smallBoard;
-
 	}
 
 	public Move findOptimalMove(String board[][]) {
-		int bestVal = -Integer.MAX_VALUE;
 
-		int moveI = -9;
-		int moveJ = -9;
-
-		int step = 0;
-		int alpha = -Integer.MAX_VALUE;
-		int beta = Integer.MAX_VALUE;
+		ArrayList<GameAlgorithm> th = new ArrayList<GameAlgorithm>();
 
 		board = buildSmallBoard(board);
 
 		for (int i = startI; i < endI; i++) {
-			if (alpha >= beta)
-				break;
 
 			for (int j = startJ; j < endJ; j++) {
-				// temp
-				// if (!hasAdjacent(i, j, board))
-				// continue;
 
 				if (board[i][j].equals("-")) {
 
 					board[i][j] = "X";
 
-					int moveVal = minimax(board, false, step, alpha, beta);
+					GameAlgorithm g = new GameAlgorithm(board, i, j, startI, startJ, endI, endJ);
 
-					alpha = Math.max(moveVal, alpha);
-
+					th.add(g);
 					board[i][j] = "-";
-
-					if (moveVal > bestVal) {
-						moveI = i;
-						moveJ = j;
-						bestVal = moveVal;
-					}
-					if (alpha >= beta)
-						break;
-
 				}
 			}
 		}
+
+		for (int i = 0; i < th.size(); i++) {
+			th.get(i).start();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		for (int i = 0; i < th.size(); i++) {
+			try {
+				th.get(i).join(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		int moveI = -1, moveJ = -1;
+
+		int ind = getBestIndex(th);
+		moveI = th.get(ind).getI();
+		moveJ = th.get(ind).getJ();
+
 		System.out.println(moveI + ", " + moveJ);
 		return new Move(moveI, moveJ);
 	}
+
+	// if (board[i][j].equals("-")) {
+	//
+	// board[i][j] = "X";
+	//
+	// GameAlgorithm g = new GameAlgorithm(board, i, j, startI, startJ, endI,
+	// endJ);
+	//
+	// th.add(g);
+	// board[i][j] = "-";
+	// }
 
 }

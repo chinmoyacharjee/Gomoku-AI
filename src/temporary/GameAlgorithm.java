@@ -8,20 +8,32 @@ public class GameAlgorithm extends Thread {
 
 	private int rowColom = 10;
 	private int winValue = 5;
-	
+
 	private int best;
 
 	private String[][] board;
 
 	private int row;
 	private int col;
-	
+
+	private int startI;
+	private int startJ;
+	private int endI;
+	private int endJ;
+
+	int depth = 2;
+
 	private Evaluation evaluation;
 
-	public GameAlgorithm(String[][] board, int i, int j) {
+	public GameAlgorithm(String[][] board, int i, int j, int startI, int startJ, int endI, int endJ) {
 		this.board = board;
 		this.row = i;
 		this.col = j;
+		this.startI = startI;
+		this.startJ = startJ;
+		this.endI = endI;
+		this.endJ = endJ;
+		this.evaluation = new Evaluation();
 	}
 
 	private boolean isValid(int tx, int ty, String board[][]) {
@@ -89,6 +101,7 @@ public class GameAlgorithm extends Thread {
 					return true;
 		return false;
 	}
+
 	private boolean isValidDir(int tx, int ty) {
 		if (tx >= rowColom || tx < 0)
 			return false;
@@ -96,6 +109,7 @@ public class GameAlgorithm extends Thread {
 			return false;
 		return true;
 	}
+
 	private boolean hasAdjacent(int i, int j, String board[][]) {
 
 		for (int ii = 0; ii < 8; ii++) {
@@ -113,28 +127,24 @@ public class GameAlgorithm extends Thread {
 					return true;
 			}
 		}
-
 		return false;
-
 	}
-
 
 	private int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
 
-		if (step == 2) {
-			return evaluation.evaluate(board);
+		if (step == depth) {
+			return evaluation.evaluate(board, turn);
 		}
-		int score = evaluate(board);
 
 		if (turn) {
 			int best = -Integer.MAX_VALUE;
-			for (int i = 0; i < rowColom; i++) {
+			for (int i = startI; i < endI; i++) {
 				if (alpha >= beta) {
 					return alpha;
 				}
-				for (int j = 0; j < rowColom; j++) {
-					if (!hasAdjacent(i, j, board))
-						continue;
+				for (int j = startJ; j < endJ; j++) {
+//					if (!hasAdjacent(i, j, board))
+//						continue;
 
 					if (board[i][j].equals("-")) {
 						board[i][j] = "X";
@@ -154,13 +164,13 @@ public class GameAlgorithm extends Thread {
 
 		} else {
 			int best = Integer.MAX_VALUE;
-			for (int i = 0; i < rowColom; i++) {
+			for (int i = startI; i < endI; i++) {
 				if (alpha >= beta) {
 					return beta;
 				}
-				for (int j = 0; j < rowColom; j++) {
-					if (!hasAdjacent(i, j, board))
-						continue;
+				for (int j = startJ; j < endJ; j++) {
+//					if (!hasAdjacent(i, j, board))
+//						continue;
 
 					if (board[i][j].equals("-")) {
 						board[i][j] = "O";
@@ -179,13 +189,14 @@ public class GameAlgorithm extends Thread {
 
 			return best;
 		}
-
 	}
 
 	public int getBest() {
+
 		try {
 			this.join();
 		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return best;
@@ -202,21 +213,16 @@ public class GameAlgorithm extends Thread {
 	@Override
 	public void run() {
 
-//		try {
-//			Thread.sleep(100);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
+//		System.out.println(startI + " " + startJ);
+
+		int alpha = -Integer.MAX_VALUE;
+		int beta = Integer.MAX_VALUE;
 
 		System.out.println("AliveBefore: " + this.getId() + "; " + this.isAlive() + " best: " + best + " " + row + col);
 		//
-		best = minimax(board, false, 0, -1000, 1000);
+		best = minimax(board, false, 0, alpha, beta);
 
 		System.out.println("AliveAfter : " + this.getId() + "; " + this.isAlive() + " best: " + best + " " + row + col);
-
-		// synchronized (board) {
-		// }
-		// System.out.println(best + ", " + row + ", " + col);
 
 	}
 
