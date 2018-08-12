@@ -44,6 +44,7 @@ public class Evaluation {
 
 				if (type.equals("mix") && consecutivePattern.length() != 6)
 					return -1;
+				
 				boolean cpu;
 				if (type.equals("CPU"))
 					cpu = true;
@@ -55,15 +56,17 @@ public class Evaluation {
 
 					if (index == -1)
 						return -1;
+
+					if (tx == rowColom - 1 || ty == rowColom - 1) {
+						return patternClass.getEvaluateValuePatternWise(index, cpu, cpuTurn);
+
+					}
+
 					tx += dx;
 					ty += dy;
 
 					if (!isValidDirection(tx, ty))
 						return -1;
-
-					if (tx == rowColom || ty == rowColom) {
-						return patternClass.getEvaluateValuePatternWise(index, cpu, cpuTurn);
-					}
 					consecutivePattern += board[tx][ty];
 
 					saveIndex = index;
@@ -92,7 +95,7 @@ public class Evaluation {
 	}
 
 	public int evaluate(String board[][], boolean cpuTurn) {
-		
+
 		int evalVal = 0;
 		for (int i = 0; i < rowColom; i++) {
 			for (int j = 0; j < rowColom; j++) {
@@ -111,7 +114,7 @@ public class Evaluation {
 			}
 
 		}
-		
+
 		return evalVal;
 	}
 
