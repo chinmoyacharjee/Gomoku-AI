@@ -69,6 +69,12 @@ public class Game {
 				board[i][j] = "-";
 			}
 		}
+//		board[0][9] = "O";
+//		board[0][8] = "O";
+//		board[0][7] = "O";
+//		board[0][6] = "O";
+//		board[0][5] = "O";
+//		board[0][4] = "O";
 		return board;
 	}
 
@@ -254,6 +260,9 @@ public class Game {
 			}
 		}
 
+		System.out.println("minmaxI: " + minI + " " + maxI);
+		System.out.println("minmaxJ: " + minJ + " " + maxJ);
+
 		String[][] smallBoard = new String[rowColom][rowColom];
 
 		int x = 1;
@@ -266,14 +275,14 @@ public class Game {
 		else
 			minJ = 0;
 
-		if (maxI < rowColom - x)
+		if (maxI < rowColom - 1)
 			maxI += x;
 		else
 			maxI = rowColom - 1;
-		if (maxJ < rowColom - x)
+		if (maxJ < rowColom - 1)
 			maxJ += x;
 		else
-			maxJ = 0;
+			maxJ = rowColom - 1;
 
 		startI = minI;
 		startJ = minJ;
@@ -281,8 +290,11 @@ public class Game {
 		endI = maxI + 1;
 		endJ = maxJ + 1;
 
+		System.out.println("minI: " + minI + " maxI: " + maxI + " StartI: " + startI + " endI: " + endI);
+		System.out.println("minJ: " + minJ + " maxJ: " + maxJ + " StartJ: " + startJ + " endJ: " + endJ);
+
 		for (int i = minI; i <= maxI; i++) {
-			for (int j = 0; j <= maxJ; j++) {
+			for (int j = minJ; j <= maxJ; j++) {
 				smallBoard[i][j] = board[i][j];
 			}
 		}
@@ -303,6 +315,9 @@ public class Game {
 
 		board = buildSmallBoard(board);
 
+		System.out.println(startI + " " + endI);
+		System.out.println(startJ + " " + endJ);
+
 		for (int i = startI; i < endI; i++) {
 			if (alpha >= beta)
 				break;
@@ -321,6 +336,7 @@ public class Game {
 					alpha = Math.max(moveVal, alpha);
 
 					board[i][j] = "-";
+					System.out.println(i + ", " + j + " value: " + moveVal);
 
 					if (moveVal > bestVal) {
 						moveI = i;
