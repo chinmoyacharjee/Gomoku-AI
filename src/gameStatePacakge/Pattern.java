@@ -8,7 +8,6 @@ public class Pattern {
 	public static HashMap<String, Integer> patternsCPU;
 	public static HashMap<String, Integer> patternsHUMAN;
 
-
 	private String[] patternListX = { "XXXXX", "-XXXX-", "XXXX-", "XX-XX", "XXX-X", "X-XXX-", "-XXX-", "XXX--", "-XX-X",
 			"XX-X-", "-XX-X-", "--XX-", "XX---", "X---X", "X----", "--X--", "-X---" };
 	private String[] patternListO = { "OOOOO", "-OOOO-", "OOOO-", "OO-OO", "OOO-O", "O-OOO-", "-OOO-", "OOO--", "-OO-O",
@@ -93,13 +92,12 @@ public class Pattern {
 
 		if (isCpuPatternType) {
 			value = patternsCPU.get(patternListX[index]);
-//			if (cpuTurn)
-//				value *= 5;
+			// if (cpuTurn)
+			// value *= 5;
 		} else {
-
 			value = patternsHUMAN.get(patternListO[index]);
-//			if (!cpuTurn)
-//				value *= 5;
+			// if (!cpuTurn)
+			// value *= 5;
 		}
 
 		return value;

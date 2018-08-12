@@ -1,10 +1,5 @@
 package gameStatePacakge;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-
 import gameSettings.GameSettings;
 
 public class Evaluation {
@@ -44,7 +39,7 @@ public class Evaluation {
 
 				if (type.equals("mix") && consecutivePattern.length() != 6)
 					return -1;
-				
+
 				boolean cpu;
 				if (type.equals("CPU"))
 					cpu = true;
