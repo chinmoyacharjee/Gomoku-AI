@@ -14,7 +14,6 @@ import java.awt.image.BufferedImage;
 import asset.ImageLoader;
 import displayPackage.Display;
 import gameSettings.GameSettings;
-import temporary.GameManipulation;
 
 public class GameGraphicsManagement implements Runnable, KeyListener, MouseListener, MouseMotionListener {
 
@@ -38,9 +37,9 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	private Graphics g;
 
 	private int rowColom;
-	// temp
+
 	private Game game;
-	//
+
 	private BufferedImage black;
 	private BufferedImage white;
 	private BufferedImage mouseIndicator;
@@ -55,13 +54,12 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	private boolean firstMove = true;
 
-	// temporary
 	private String[][] board;
 	private String player;
 	private String playerCpu = "X";
 	private String playerHuman = "O";
 	private String playerEmpty = "-";
-	//
+
 
 	public GameGraphicsManagement() {
 
@@ -75,11 +73,9 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	private void init() {
 
-		// temporary
 		player = playerCpu;
-		//
+
 		game = new Game();
-		// evaluation = new Evaluation();
 
 		black = ImageLoader.loadImage("/Images/bl1.png", BOX_width, BOX_height);
 		white = ImageLoader.loadImage("/Images/w1.png", BOX_width, BOX_height);
@@ -142,7 +138,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	private void mousePointAt(Graphics g) {
 
-		g.setColor(Color.white);
+		g.setColor(Color.YELLOW);
 		g.setFont(new Font("Agency fb", Font.CENTER_BASELINE, 40));
 
 		String s = colomToString(mousePointAtY - 1) + ", " + mousePointAtX;
@@ -222,10 +218,10 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	private void drawWinStatus(Graphics g) {
 		if (isGameEnd) {
-			g.setColor(Color.white);
-			g.setFont(new Font("Century Gothic", Font.CENTER_BASELINE, 20));
+			g.setColor(Color.yellow);
+			g.setFont(new Font("Century Gothic", Font.CENTER_BASELINE, 30));
 
-			g.drawString(winStatement, width - 340, 400);
+			g.drawString(winStatement, width - 340, 360);
 
 		}
 	}
@@ -242,17 +238,31 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	private void drawLastMove(Graphics g) {
 		if (isGameStarted) {
-			g.setFont(new Font("Century Gothic", Font.CENTER_BASELINE, 20));
+			g.setFont(new Font("Century Gothic", Font.CENTER_BASELINE, 40));
 
 			g.setColor(Color.white);
 			g.drawString("Last Move:", width - 340, 220);
+
+			g.setFont(new Font("Century Gothic", Font.CENTER_BASELINE, 20));
+
 			g.drawString(lastMoveComputer, width - 340, 250);
 
 			g.setColor(Color.black);
 			g.drawString(lastMoveYou, width - 340, 280);
 
 		}
+	}
 
+	private void drawPlayerSign(Graphics g) {
+		if (isGameStarted) {
+			g.drawImage(black, width - 340, 400, null);
+			g.setFont(new Font("Century Gothic", Font.CENTER_BASELINE, 20));
+			g.setColor(Color.WHITE);
+			g.drawString("Computer", width - 280, 430);
+			g.drawImage(white, width - 340, 450, null);
+			g.drawString("You", width - 280, 480);
+
+		}
 	}
 
 	private void draw(Graphics g) {
@@ -260,6 +270,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 		drawBackground(g);
 		drawLogo(g);
 		drawStartPlayString(g);
+		drawPlayerSign(g);
 		drawLastMove(g);
 		drawWinStatus(g);
 		drawBoard(g);
@@ -293,6 +304,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 				move = game.getFirstMove();
 				firstMove = false;
 			} else {
+				System.out.println("Thinking. . . !!");
 				move = game.findOptimalMove(board);
 			}
 
@@ -321,16 +333,13 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 		while (true) {
 			render();
-			if (isGameStarted)
+			if (isGameStarted && !isGameEnd)
 				play();
-
 		}
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		int x = e.getX();
-		int y = e.getY();
 
 		if (!isGameEnd && player.equals(playerHuman)) {
 
@@ -393,6 +402,12 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 			mousePointAtX = y / BOX_height;
 			mousePointAtY = x / BOX_width;
 
+			if (y % 50 >= 25)
+				mousePointAtX++;
+
+			if (x % 50 >= 25)
+				mousePointAtY++;
+
 			if (mousePointAtX < 1 || mousePointAtX > rowColom || mousePointAtY < 1 || mousePointAtY > rowColom) {
 				mousePointAtX = -1;
 				mousePointAtY = -1;
@@ -426,4 +441,5 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	public void keyReleased(KeyEvent e) {
 
 	}
+
 }
