@@ -6,7 +6,8 @@ Because pieces are not moved or removed from the board, Gomoku may also be playe
  -- collected from  [Wikipedia](https://en.wikipedia.org/wiki/Gomoku)
  
  # Gomoku: In this project
- Here we build the exact gomoku game that described avobe with `10x10` board. This game can be played with AI.  
+ Here we build the exact gomoku game that described avobe with `10x10` board. The game is AI based. AI uses Minimax algorithm to find the best move against the human moves. The player who makes five in a row will win the game. To understand better, watch the project demonstration.
+ 
  
  [Project Demonstration (Video)](https://drive.google.com/open?id=1B_kmhzqczRzS5gTU04k4T7Fdp3Ek5gn-)
  
