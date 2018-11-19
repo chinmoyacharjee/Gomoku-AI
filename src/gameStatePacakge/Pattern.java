@@ -92,12 +92,12 @@ public class Pattern {
 
 		if (isCpuPatternType) {
 			value = patternsCPU.get(patternListX[index]);
-			// if (cpuTurn)
-			// value *= 5;
+			if (cpuTurn)
+				value *= 5;
 		} else {
 			value = patternsHUMAN.get(patternListO[index]);
-			// if (!cpuTurn)
-			// value *= 5;
+			if (!cpuTurn)
+				value *= 5;
 		}
 
 		return value;
