@@ -60,6 +60,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 	private String playerHuman = "O";
 	private String playerEmpty = "-";
 
+	private int computerMoves = 0;
 
 	public GameGraphicsManagement() {
 
@@ -305,14 +306,17 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 				firstMove = false;
 			} else {
 				System.out.println("Thinking. . . !!");
-				move = game.findOptimalMove(board);
+				move = game.findOptimalMove(board, computerMoves);
 			}
 
 			board[move.row][move.col] = playerCpu;
+			
+			computerMoves++;
 
 			lastMoveComputer = "Computer, " + colomToString(move.col) + (move.row + 1);
 
 			checkWin();
+			
 			player = playerHuman;
 		}
 
