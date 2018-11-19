@@ -144,7 +144,7 @@ public class Game {
 		return false;
 	}
 
-	private int minimax(String board[][], boolean turn, int step, int alpha, int beta) {
+	private int minimax(String board[][], boolean turn, int step, int alpha, int beta, int computerMoves) {
 
 		if (step == depth) {
 			return evaluation.evaluate(board, turn);
@@ -154,16 +154,16 @@ public class Game {
 			int best = -Integer.MAX_VALUE;
 			for (int i = startI; i < endI; i++) {
 				if (alpha >= beta) {
-					return alpha;
+					return best;
 				}
 				for (int j = startJ; j < endJ; j++) {
-					if (!hasAdjacent(i, j, board))
+					if (!hasAdjacent(i, j, board, computerMoves))
 						continue;
 
 					if (board[i][j].equals("-")) {
 						board[i][j] = "X";
 
-						int minmaxValue = minimax(board, !turn, step + 1, alpha, beta);
+						int minmaxValue = minimax(board, !turn, step + 1, alpha, beta, computerMoves);
 						board[i][j] = "-";
 						best = Math.max(best, minmaxValue);
 						alpha = Math.max(best, alpha);
@@ -180,16 +180,16 @@ public class Game {
 			int best = Integer.MAX_VALUE;
 			for (int i = startI; i < endI; i++) {
 				if (alpha >= beta) {
-					return beta;
+					return best;
 				}
 				for (int j = startJ; j < endJ; j++) {
-					if (!hasAdjacent(i, j, board))
+					if (!hasAdjacent(i, j, board, computerMoves))
 						continue;
 
 					if (board[i][j].equals("-")) {
 						board[i][j] = "O";
 
-						int minmaxValue = minimax(board, turn, step + 1, alpha, beta);
+						int minmaxValue = minimax(board, turn, step + 1, alpha, beta, computerMoves);
 						board[i][j] = "-";
 						best = Math.min(best, minmaxValue);
 						beta = Math.min(best, beta);
@@ -205,12 +205,16 @@ public class Game {
 		}
 	}
 
-	private boolean hasAdjacent(int i, int j, String board[][]) {
-
+	private boolean hasAdjacent(int i, int j, String board[][], int computerMoves) {
+		
+		int adjCount = 1;
+//		if(computerMoves<12) adjCount = 2;
+//		else adjCount = 1;
+		
 		for (int ii = 0; ii < 8; ii++) {
 			int x = i;
 			int y = j;
-			for (int jj = 0; jj < 2; jj++) {
+			for (int jj = 0; jj < adjCount; jj++) {
 
 				x += fx[ii];
 				y += fy[ii];
@@ -291,7 +295,7 @@ public class Game {
 
 	}
 
-	public Move findOptimalMove(String board[][]) {
+	public Move findOptimalMove(String board[][], int computerMoves) {
 		int bestVal = -Integer.MAX_VALUE;
 
 		int moveI = -9;
@@ -309,14 +313,14 @@ public class Game {
 
 			for (int j = startJ; j < endJ; j++) {
 
-				if (!hasAdjacent(i, j, board))
+				if (!hasAdjacent(i, j, board, computerMoves))
 					continue;
 
 				if (board[i][j].equals("-")) {
 
 					board[i][j] = "X";
 
-					int moveVal = minimax(board, false, step, alpha, beta);
+					int moveVal = minimax(board, false, step, alpha, beta, computerMoves);
 
 					alpha = Math.max(moveVal, alpha);
 
