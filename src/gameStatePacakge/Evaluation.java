@@ -23,6 +23,7 @@ public class Evaluation {
 		return true;
 	}
 
+//	Main trick. Return heuristic value(profit) according to the pattern found in the board (defined in Pattern.java class) 
 	private int findPattern(int tx, int ty, int dx, int dy, String board[][], boolean cpuTurn) {
 
 		String consecutivePattern = "";

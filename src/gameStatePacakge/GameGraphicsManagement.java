@@ -71,7 +71,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 		this.rowColom = GameSettings.rowColom;
 	}
-
+// initialized all images, created game instance and added all sorts of listeners.
 	private void init() {
 
 		player = playerCpu;
@@ -89,12 +89,13 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 		display.canvas.addMouseListener(this);
 	}
 
+//	start
 	public synchronized void start() {
 		thread = new Thread(this);
 		thread.start();
 
 	}
-
+//	stop
 	public synchronized void stop() {
 		try {
 			thread.join();
@@ -104,11 +105,12 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	}
 
+//	functionality of Drawing board 
 	private void drawBoard(Graphics g) {
 
 		g.setColor(Color.WHITE);
 
-		int lineWeight = 1;
+		int lineWeight = 1; // thickness of lines of the board 
 
 		int lineNumber = 1;
 		char lineCharacter = 'A';
@@ -130,6 +132,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	}
 
+//	Returns Alphabet corresponding to the line number
 	private String colomToString(int x) {
 		char c = 'A';
 		c += x;
@@ -137,6 +140,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	}
 
+//	Functionality of managing mouse pointer
 	private void mousePointAt(Graphics g) {
 
 		g.setColor(Color.YELLOW);
@@ -152,6 +156,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	}
 
+//	Functionality of drawing the loaction of mouse pointing at
 	private void mousePointIndicatior(Graphics g) {
 
 		int x = mousePointAtY * BOX_width - (BOX_width / 2);
@@ -165,6 +170,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	}
 
+//	Functionality drawing player according to the board
 	private void drawPlayer(Graphics g) {
 
 		BufferedImage playerImage = null;
@@ -188,6 +194,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	}
 
+//	Check board state [win/lose/tie]
 	private void checkWin() {
 		int x = game.checkWin(board);
 
@@ -280,6 +287,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	}
 
+//	renders all graphical elements
 	private void render() {
 		buffer = display.canvas.getBufferStrategy();
 		if (buffer == null) {
@@ -297,6 +305,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 		g.dispose();
 	}
 
+//	Where AI calls the optimal move
 	private void play() {
 		Move move;
 		if (player.equals(playerCpu)) {
@@ -322,6 +331,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 
 	}
 
+//	Reset functionality
 	public void resetGame() {
 		board = game.initialiseBoard();
 		isGameEnd = false;
@@ -342,6 +352,7 @@ public class GameGraphicsManagement implements Runnable, KeyListener, MouseListe
 		}
 	}
 
+//	Assigning move to the board array according to the mouse click
 	@Override
 	public void mouseClicked(MouseEvent e) {
 

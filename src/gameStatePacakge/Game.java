@@ -25,6 +25,7 @@ public class Game {
 		evaluation = new Evaluation();
 	}
 
+//	Print the board on console
 	public void printBoard(String board[][]) {
 		for (int i = 0; i < rowColom; i++)
 			System.out.print("|-----");
@@ -46,6 +47,7 @@ public class Game {
 
 	}
 
+//	First move as random move
 	public Move randomMove(String board[][]) {
 
 		while (true) {
@@ -58,10 +60,12 @@ public class Game {
 		}
 	}
 
+//	First move as fixed move
 	public Move getFirstMove() {
 		return new Move(4, 4);
 	}
 
+//	Initialized the board
 	public String[][] initialiseBoard() {
 		String[][] board = new String[rowColom][rowColom];
 		for (int i = 0; i < rowColom; i++) {
@@ -72,6 +76,7 @@ public class Game {
 		return board;
 	}
 
+//	Checking move validation
 	private boolean isValid(int tx, int ty, String board[][], String player) {
 
 		if (tx >= rowColom || tx < 0)
@@ -85,6 +90,7 @@ public class Game {
 		return true;
 	}
 
+//	Checking direction validation
 	private boolean isValidDir(int tx, int ty) {
 		if (tx >= rowColom || tx < 0)
 			return false;
@@ -93,6 +99,7 @@ public class Game {
 		return true;
 	}
 
+	
 	private boolean isWinner(int tx, int ty, int dx, int dy, String board[][]) {
 		String player = board[tx][ty];
 		int count = 0;
@@ -205,6 +212,7 @@ public class Game {
 		}
 	}
 
+	
 	private boolean hasAdjacent(int i, int j, String board[][], int computerMoves) {
 		
 		int adjCount = 1;
@@ -231,6 +239,9 @@ public class Game {
 
 	}
 
+/*	Reducing searching space. Because we do not need to traverse every cell on the board
+	Just traverse to all the cells those who have immediate adjacent filled up cell (defined in `hasAdjacent` method) 
+*/
 	private String[][] buildSmallBoard(String board[][]) {
 		int maxI = 0;
 		int maxJ = 0;
@@ -295,6 +306,7 @@ public class Game {
 
 	}
 
+//	Calls the minimax function for optimal move
 	public Move findOptimalMove(String board[][], int computerMoves) {
 		int bestVal = -Integer.MAX_VALUE;
 
