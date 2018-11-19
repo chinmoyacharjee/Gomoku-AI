@@ -101,7 +101,7 @@ public class Evaluation {
 					int value = findPattern(i, j, dirX, dirY, board, cpuTurn);
 
 					if (value != -1) {
-						// System.out.println(value);
+						// System.out .println(value);
 						evalVal += value;
 					}
 				}
