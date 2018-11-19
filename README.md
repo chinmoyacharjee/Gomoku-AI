@@ -42,7 +42,9 @@ Because pieces are not moved or removed from the board, Gomoku may also be playe
     - [Learn Alpha-beta pruning](https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/)
   - Evaluation Function
   
-  
+  ## Contributors
+  1. [Rafiul Islam Ratul](https://github.com/RATULri)
+  2. [Md. Jewel Rana](https://github.com/Jewel-iitdu) 
    
   
   
