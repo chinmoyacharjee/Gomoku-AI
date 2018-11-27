@@ -11,7 +11,7 @@ Because pieces are not moved or removed from the board, Gomoku may also be playe
  
  [Project Demonstration (Video)](https://drive.google.com/open?id=1B_kmhzqczRzS5gTU04k4T7Fdp3Ek5gn-)
  
- Some scrennshots of the project:
+ Some screenshots of the project:
  
  ![](https://github.com/Chinmoy007/Gomoku-AI/blob/master/Assests/Github/gm1.PNG)
  ![](https://github.com/Chinmoy007/Gomoku-AI/blob/master/Assests/Github/gm2.PNG)
